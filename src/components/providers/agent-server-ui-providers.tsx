@@ -14,6 +14,7 @@ import {
   setI18n,
 } from "#/i18n";
 import { ActiveBackendProvider } from "#/contexts/active-backend-context";
+import { HomeModelPickProvider } from "#/contexts/home-model-pick-context";
 import { CloudOrganizationBoundary } from "#/components/features/backends/cloud-organization-boundary";
 import { useHydrateFreeModels } from "#/hooks/query/use-free-models";
 import type { TelemetryConfig } from "#/services/telemetry";
@@ -138,7 +139,9 @@ export function AgentServerUIProviders({
   return (
     <I18nextProvider i18n={resolvedI18n} defaultNS={OPENHANDS_I18N_NAMESPACE}>
       <QueryClientProvider client={resolvedQueryClient}>
-        <ActiveBackendProvider>{wrappedContent}</ActiveBackendProvider>
+        <ActiveBackendProvider>
+          <HomeModelPickProvider>{wrappedContent}</HomeModelPickProvider>
+        </ActiveBackendProvider>
       </QueryClientProvider>
     </I18nextProvider>
   );

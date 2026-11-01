@@ -1,4 +1,10 @@
-import { fireEvent, render, screen, waitFor } from "@testing-library/react";
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+} from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { QueryClientProvider } from "@tanstack/react-query";
@@ -13,6 +19,25 @@ import WorkspacesService from "#/api/workspaces-service/workspaces-service.api";
 import { HOME_PROMPT_DRAFT_KEY } from "#/hooks/chat/use-draft-persistence";
 import { createAgentServerQueryClient } from "#/query-client-config";
 import { useConversationStore } from "#/stores/conversation-store";
+import { useCreateConversation } from "#/hooks/mutation/use-create-conversation";
+import { ChatInputLlmProfilePicker } from "#/components/features/chat/components/chat-input-llm-profile-picker";
+import { useModelStore } from "#/stores/model-store";
+import { HomeModelPickProvider } from "#/contexts/home-model-pick-context";
+import { AGENT_PROFILES_QUERY_KEYS } from "#/hooks/query/query-keys";
+import { ChatInputModelMenuContent } from "#/components/features/chat/components/chat-input-model";
+
+const acpPicker = vi.hoisted(() => ({ visible: false }));
+
+const activeSelection = vi.hoisted(() => ({
+  backend: {
+    id: "local-id",
+    name: "Local",
+    host: "http://localhost",
+    apiKey: "test",
+    kind: "local" as "local" | "cloud",
+  },
+  orgId: null as string | null,
+}));
 
 // The launch failure path is exercised end to end: the real composer, the real
 // conversation store, the real toast handlers and the app's query client (with
@@ -34,16 +59,7 @@ vi.mock("#/context/navigation-context", () => ({
 }));
 
 vi.mock("#/contexts/active-backend-context", () => ({
-  useActiveBackend: () => ({
-    backend: {
-      id: "local-id",
-      name: "Local",
-      host: "http://localhost",
-      apiKey: "test",
-      kind: "local" as const,
-    },
-    orgId: null,
-  }),
+  useActiveBackend: () => activeSelection,
 }));
 
 vi.mock("#/hooks/use-llm-configured", () => ({
@@ -65,7 +81,33 @@ vi.mock("#/hooks/use-tracking", () => ({
 // issue their own requests; none of them take part in launching.
 vi.mock("#/components/features/chat/components/chat-input-actions", () => ({
   ChatInputActions: ({ handleSubmit }: { handleSubmit: () => void }) => (
-    <button type="button" data-testid="submit-button" onClick={handleSubmit} />
+    <>
+      <ChatInputLlmProfilePicker />
+      {acpPicker.visible && (
+        <ul>
+          <ChatInputModelMenuContent
+            onClose={() => {}}
+            model={{
+              isAcpContext: true,
+              displayModel: "ACP model",
+              currentModelId: "current",
+              selectedModelId: "current",
+              availableAcpModels: [{ id: "selected", label: "Selected model" }],
+              agentDefaultLabel: "Agent default",
+              showAcpPicker: true,
+              switchConversationId: null,
+              destinationPath: "/settings/agents",
+              destinationLabel: "Settings",
+            }}
+          />
+        </ul>
+      )}
+      <button
+        type="button"
+        data-testid="submit-button"
+        onClick={handleSubmit}
+      />
+    </>
   ),
 }));
 
@@ -96,13 +138,67 @@ const unreachable = () =>
     UNREACHABLE_MESSAGE,
   );
 
-const renderLauncher = () =>
-  render(
-    <QueryClientProvider client={createAgentServerQueryClient()}>
-      <HomeChatLauncher />
-      <Toaster />
-    </QueryClientProvider>,
+function NonHomeLaunch() {
+  const { mutate } = useCreateConversation();
+  return (
+    <button type="button" onClick={() => mutate({ query: "sidebar launch" })}>
+      Sidebar launch
+    </button>
   );
+}
+
+const renderLauncher = () => {
+  const client = createAgentServerQueryClient();
+  let showHome = true;
+  const tree = () => (
+    <QueryClientProvider client={client}>
+      <HomeModelPickProvider>
+        {showHome && <HomeChatLauncher />}
+        <NonHomeLaunch />
+        <Toaster />
+      </HomeModelPickProvider>
+    </QueryClientProvider>
+  );
+  const view = render(tree());
+  return {
+    ...view,
+    client,
+    rerenderLauncher: (visible = true) => {
+      showHome = visible;
+      view.rerender(tree());
+    },
+  };
+};
+
+async function pickHomeModel() {
+  await userEvent.click(await screen.findByTestId("chat-input-llm-profile"));
+  await userEvent.click(
+    await screen.findByTestId("chat-input-llm-profile-option-Smart"),
+  );
+}
+
+function arrangeModelProfiles() {
+  vi.mocked(ProfilesService.listProfiles).mockResolvedValue({
+    active_profile: "Fast",
+    profiles: [
+      { name: "Fast", model: "openai/fast", api_key_set: true },
+      { name: "Smart", model: "openai/smart", api_key_set: true },
+    ],
+  } as never);
+  vi.spyOn(AgentProfilesService, "getProfile").mockResolvedValue({
+    profile: { id: "default-id", name: "default", agent_kind: "openhands" },
+  } as never);
+  vi.spyOn(AgentServerConversationService, "switchProfile").mockResolvedValue(
+    undefined as never,
+  );
+  return vi
+    .spyOn(AgentServerConversationService, "createConversation")
+    .mockResolvedValue({
+      id: "task-id",
+      app_conversation_id: "conversation-id",
+      agent_server_url: "http://localhost",
+    } as never);
+}
 
 // jsdom has no layout, so `innerText` (which the composer reads on submit) is
 // undefined; mirror `textContent` the way a browser would for plain text.
@@ -121,6 +217,11 @@ async function submitPrompt() {
 
 describe("HomeChatLauncher failed launch", () => {
   beforeEach(() => {
+    activeSelection.backend.id = "local-id";
+    activeSelection.backend.kind = "local";
+    activeSelection.orgId = null;
+    acpPicker.visible = false;
+    useModelStore.getState().clearAll();
     Object.defineProperty(HTMLElement.prototype, "innerText", {
       configurable: true,
       get() {
@@ -177,6 +278,123 @@ describe("HomeChatLauncher failed launch", () => {
     useConversationStore.getState().clearMessageRestoreIfEmpty();
     vi.restoreAllMocks();
   });
+
+  it.each(["local", "cloud"] as const)(
+    "keeps a %s home pick pending through a non-home launch and consumes it only on home success",
+    async (kind) => {
+      activeSelection.backend.kind = kind;
+      const create = arrangeModelProfiles();
+      const view = renderLauncher();
+      await pickHomeModel();
+
+      await userEvent.click(
+        screen.getByRole("button", { name: "Sidebar launch" }),
+      );
+      await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+      expect(create.mock.calls[0][0]).not.toHaveProperty(
+        "suppressRouterAtStart",
+      );
+      view.rerenderLauncher(false);
+      view.rerenderLauncher(true);
+
+      await submitPrompt();
+      await waitFor(() => expect(create).toHaveBeenCalledTimes(2));
+      expect(create.mock.calls[1]?.[0]?.suppressRouterAtStart).toBe(true);
+
+      await submitPrompt();
+      await waitFor(() => expect(create).toHaveBeenCalledTimes(3));
+      expect(create.mock.calls[2][0]).not.toHaveProperty(
+        "suppressRouterAtStart",
+      );
+    },
+  );
+
+  it("keeps the home pick after a rejected launch for the retry", async () => {
+    const create = arrangeModelProfiles().mockRejectedValueOnce(unreachable());
+    renderLauncher();
+    await pickHomeModel();
+
+    await submitPrompt();
+    await screen.findByText(UNREACHABLE_MESSAGE);
+    await submitPrompt();
+    await waitFor(() => expect(create).toHaveBeenCalledTimes(2));
+
+    expect(create.mock.calls[1]?.[0]?.suppressRouterAtStart).toBe(true);
+  });
+
+  it.each(["backend", "organization", "agent"] as const)(
+    "drops a pending home pick when the %s changes",
+    async (boundary) => {
+      if (boundary === "organization") {
+        activeSelection.backend.kind = "cloud";
+        activeSelection.orgId = "org-a";
+      }
+      const create = arrangeModelProfiles();
+      const view = renderLauncher();
+      await pickHomeModel();
+
+      if (boundary === "backend") activeSelection.backend.id = "other-local";
+      if (boundary === "organization") activeSelection.orgId = "other-org";
+      if (boundary === "agent") {
+        vi.mocked(AgentProfilesService.listProfiles).mockResolvedValue({
+          profiles: [{ id: "acp-id", name: "ACP", agent_kind: "acp" }],
+          active_agent_profile_id: "acp-id",
+        } as never);
+        await act(async () => {
+          await view.client.invalidateQueries({
+            queryKey: AGENT_PROFILES_QUERY_KEYS.all,
+          });
+        });
+      }
+      view.rerenderLauncher();
+      await submitPrompt();
+      await waitFor(() => expect(create).toHaveBeenCalled());
+
+      expect(create.mock.lastCall?.[0]).not.toHaveProperty(
+        "suppressRouterAtStart",
+      );
+    },
+  );
+
+  it.each(["agent-default", "selected"])(
+    "does not carry an ACP %s pick into an OpenHands launch",
+    async (option) => {
+      const create = arrangeModelProfiles();
+      vi.mocked(AgentProfilesService.listProfiles).mockResolvedValue({
+        profiles: [{ id: "acp-id", name: "ACP", agent_kind: "acp" }],
+        active_agent_profile_id: "acp-id",
+      } as never);
+      const save = vi
+        .spyOn(AgentProfilesService, "saveProfile")
+        .mockResolvedValue({
+          name: "ACP",
+        } as never);
+      acpPicker.visible = true;
+      const view = renderLauncher();
+
+      await userEvent.click(
+        await screen.findByTestId(`chat-input-acp-model-option-${option}`),
+      );
+      await waitFor(() => expect(save).toHaveBeenCalled());
+      vi.mocked(AgentProfilesService.listProfiles).mockResolvedValue({
+        profiles: [
+          { id: "default-id", name: "default", agent_kind: "openhands" },
+        ],
+        active_agent_profile_id: "default-id",
+      } as never);
+      await act(async () => {
+        await view.client.invalidateQueries({
+          queryKey: AGENT_PROFILES_QUERY_KEYS.all,
+        });
+      });
+      await submitPrompt();
+      await waitFor(() => expect(create).toHaveBeenCalledTimes(1));
+
+      expect(create.mock.lastCall?.[0]).not.toHaveProperty(
+        "suppressRouterAtStart",
+      );
+    },
+  );
 
   it("shows one error toast, no loading toast and keeps the prompt when the agent server is unreachable", async () => {
     // Arrange — every launch-path request fails the same way.

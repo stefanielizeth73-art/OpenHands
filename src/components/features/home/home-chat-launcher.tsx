@@ -1,9 +1,14 @@
 import { useConversationWorkspace } from "#/hooks/query/use-conversation-workspace";
-import { useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useTranslation } from "react-i18next";
 import { CustomChatInput } from "#/components/features/chat/custom-chat-input";
 import { useActiveBackend } from "#/contexts/active-backend-context";
+import {
+  HomeModelPickContext,
+  getHomeModelPickScope,
+} from "#/contexts/home-model-pick-context";
+import { useAgentProfiles } from "#/hooks/query/use-agent-profiles";
 import { useCreateConversation } from "#/hooks/mutation/use-create-conversation";
 import { useLocalWorkspaces } from "#/hooks/query/use-local-workspaces";
 import { useLlmProfiles } from "#/hooks/query/use-llm-profiles";
@@ -64,7 +69,7 @@ const CREATING_TOAST_MIN_VISIBLE_MS = 700;
 
 export function HomeChatLauncher() {
   const { t } = useTranslation("openhands");
-  const { backend } = useActiveBackend();
+  const { backend, orgId } = useActiveBackend();
   const { navigate } = useNavigation();
   const isLocal = backend.kind === "local";
 
@@ -126,6 +131,17 @@ export function HomeChatLauncher() {
   const { handleUpload } = useChatAttachmentUpload();
   const homeLlmProfile = useModelStore((s) => s.homeLlmProfile);
   const { data: llmProfiles } = useLlmProfiles();
+  const { data: agentProfiles } = useAgentProfiles();
+  const homeModelPickScope = getHomeModelPickScope(
+    backend.id,
+    orgId,
+    backend.connectionRevision,
+    agentProfiles?.active_agent_profile_id,
+  );
+  const homeModelPick = useContext(HomeModelPickContext);
+  useEffect(() => {
+    if (agentProfiles) homeModelPick?.discardOtherScope(homeModelPickScope);
+  }, [homeModelPickScope, agentProfiles, homeModelPick]);
   const { error: workspacesError } = useLocalWorkspaces({ enabled: isLocal });
   const {
     isolated,
@@ -181,6 +197,10 @@ export function HomeChatLauncher() {
       automationSetup: isAutomateMode,
       entryPoint: "home_chat_launcher",
     };
+    const pickedModel = homeModelPick?.getPick(homeModelPickScope) ?? null;
+    if (pickedModel) {
+      variables.suppressRouterAtStart = true;
+    }
     // An isolated backend owns its workspace, so a host selection left over
     // from a non-isolated session must not be forwarded: the server rejects it
     // (`HOME$ISOLATED_WORKSPACE_NOTICE`) and the user sees an error toast for a
@@ -255,6 +275,7 @@ export function HomeChatLauncher() {
       let isCreated = false;
       try {
         const data = await createConversation(variables);
+        homeModelPick?.consumePick(pickedModel);
         isCreated = true;
         dismissCreatingToast();
         try {

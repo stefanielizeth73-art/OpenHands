@@ -1,4 +1,5 @@
 import { renderHook } from "@testing-library/react";
+import { HomeModelPickContext } from "#/contexts/home-model-pick-context";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
@@ -7,15 +8,12 @@ const useActiveConversationMock = vi.fn();
 const useLlmProfilesMock = vi.fn();
 const switchAndLog = vi.fn();
 const setHomeLlmProfile = vi.fn();
+const markHomeModelPick = vi.fn();
 
 const freshModelStoreState = () => ({
   activeProfileByConversation: {} as Record<string, string>,
   homeLlmProfile: null as string | null,
-  homeManualModelPick: false,
   setHomeLlmProfile,
-  setHomeManualModelPick: (value: boolean) => {
-    modelStoreState.homeManualModelPick = value;
-  },
 });
 
 let modelStoreState: ReturnType<typeof freshModelStoreState> =
@@ -34,14 +32,8 @@ vi.mock("#/hooks/mutation/use-switch-llm-profile-and-log", () => ({
   useSwitchLlmProfileAndLog: () => ({ switchAndLog, isPending: false }),
 }));
 vi.mock("#/stores/model-store", () => ({
-  // `selectProfile` writes via getState() (the synchronous, non-reactive
-  // path) so the flag is set before the async switch resolves; the hook
-  // subscription form is still used for reactive reads elsewhere.
-  useModelStore: Object.assign(
-    (selector: (s: typeof modelStoreState) => unknown) =>
-      selector(modelStoreState),
-    { getState: () => modelStoreState },
-  ),
+  useModelStore: (selector: (s: typeof modelStoreState) => unknown) =>
+    selector(modelStoreState),
 }));
 // The org-permission check reads the active backend from a context this
 // wrapper-less harness doesn't provide; drive it per test instead.
@@ -79,7 +71,18 @@ const renderState = () => {
   });
   return renderHook(() => useChatInputLlmProfileState(), {
     wrapper: ({ children }) => (
-      <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
+      <QueryClientProvider client={queryClient}>
+        <HomeModelPickContext.Provider
+          value={{
+            markPick: markHomeModelPick,
+            getPick: () => null,
+            consumePick: () => {},
+            discardOtherScope: () => {},
+          }}
+        >
+          {children}
+        </HomeModelPickContext.Provider>
+      </QueryClientProvider>
     ),
   });
 };
@@ -93,6 +96,7 @@ describe("useChatInputLlmProfileState", () => {
   beforeEach(() => {
     switchAndLog.mockReset();
     setHomeLlmProfile.mockReset();
+    markHomeModelPick.mockReset();
     modelStoreState = freshModelStoreState();
     useOptionalConversationIdMock.mockReturnValue({ conversationId: "c1" });
     useActiveConversationMock.mockReturnValue({ data: undefined });
@@ -272,32 +276,29 @@ describe("useChatInputLlmProfileState", () => {
   });
 
   it("marks a home pick so the next launch suppresses route-at-start (every pick path)", () => {
-    // The flag is set at the UI chokepoint (selectProfile) so every home pick
-    // path is covered — a cloud member's held pick, an agent-profile-owned
-    // LLM pick, and a global activate. `useCreateConversation` reads-and-
-    // clears it.
+    // Each home selection path signals the Canvas-owned draft.
     useOptionalConversationIdMock.mockReturnValue({ conversationId: null });
 
     // 1. Cloud member (held pick) — can't manage org profiles.
     useCanManageOrgProfilesMock.mockReturnValue(false);
     const { result: memberResult } = renderState();
     memberResult.current.selectProfile("Smart");
-    expect(modelStoreState.homeManualModelPick).toBe(true);
+    expect(markHomeModelPick).toHaveBeenCalledTimes(1);
 
     // 2. Admin with an agent-profile-owned LLM — edits the agent profile.
-    modelStoreState.homeManualModelPick = false;
+    markHomeModelPick.mockClear();
     useCanManageOrgProfilesMock.mockReturnValue(true);
     backendKind.current = "local";
     activeAgent("reviewer", "Fast");
     const { result: adminResult } = renderState();
     adminResult.current.selectProfile("Smart");
-    expect(modelStoreState.homeManualModelPick).toBe(true);
+    expect(markHomeModelPick).toHaveBeenCalledTimes(1);
 
     // 3. Global activate — default active, no agent-profile ownership.
-    modelStoreState.homeManualModelPick = false;
+    markHomeModelPick.mockClear();
     const { result: activateResult } = renderState();
     activateResult.current.selectProfile("Smart");
-    expect(modelStoreState.homeManualModelPick).toBe(true);
+    expect(markHomeModelPick).toHaveBeenCalledTimes(1);
   });
 
   it("does not mark a pick made inside an existing conversation", () => {
@@ -306,7 +307,7 @@ describe("useChatInputLlmProfileState", () => {
     const { result } = renderState();
     result.current.selectProfile("Smart");
 
-    expect(modelStoreState.homeManualModelPick).toBe(false);
+    expect(markHomeModelPick).not.toHaveBeenCalled();
     expect(switchAndLog).toHaveBeenCalledWith("c1", "Smart");
   });
 

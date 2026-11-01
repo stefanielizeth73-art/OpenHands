@@ -1,4 +1,8 @@
-import { useCallback } from "react";
+import { useCallback, useContext } from "react";
+import {
+  HomeModelPickContext,
+  getHomeModelPickScope,
+} from "#/contexts/home-model-pick-context";
 import { useIsMutating, useQueryClient } from "@tanstack/react-query";
 import { WELL_KNOWN_DEFAULT_AGENT_PROFILE_NAME } from "#/api/agent-profiles-service/agent-profiles-service.api";
 import { useActiveBackend } from "#/contexts/active-backend-context";
@@ -47,11 +51,12 @@ export interface ChatInputLlmProfileState {
  * resolution priority so a switch is reflected instantly.
  */
 export function useChatInputLlmProfileState(): ChatInputLlmProfileState {
+  const homeModelPick = useContext(HomeModelPickContext);
   const { conversationId } = useOptionalConversationId();
   const { data: conversation } = useActiveConversation();
   const { data, isLoading } = useLlmProfiles();
   const queryClient = useQueryClient();
-  const { backend } = useActiveBackend();
+  const { backend, orgId } = useActiveBackend();
   const { data: agentProfiles } = useAgentProfiles({
     enabled: !conversationId,
   });
@@ -136,13 +141,16 @@ export function useChatInputLlmProfileState(): ChatInputLlmProfileState {
     (profileName: string) => {
       if (!canSwitchProfile || profileName === currentProfileName) return;
       if (!conversationId) {
-        // A home-page pick is an explicit model choice made before the first
-        // message: mark it so the next home launch suppresses "Run on first
-        // message" routing for that one conversation. Set here — the single
-        // chokepoint — so every pick path is covered: a cloud member's held
-        // pick, an agent-profile-owned LLM pick, and a global activate all
-        // flow through here. `useCreateConversation` reads-and-clears it.
-        useModelStore.getState().setHomeManualModelPick(true);
+        if (activeAgentProfile?.agent_kind !== "acp") {
+          homeModelPick?.markPick(
+            getHomeModelPickScope(
+              backend.id,
+              orgId,
+              backend.connectionRevision,
+              agentProfiles?.active_agent_profile_id,
+            ),
+          );
+        }
         // A home pick edits the org's agent profile or activates the LLM
         // profile org-wide, both of which a cloud member can only 403 on.
         // Hold a member's pick for the next home launch (sent as
@@ -165,6 +173,11 @@ export function useChatInputLlmProfileState(): ChatInputLlmProfileState {
     },
     [
       canManageOrgProfiles,
+      homeModelPick,
+      backend.id,
+      backend.connectionRevision,
+      orgId,
+      agentProfiles?.active_agent_profile_id,
       canSwitchProfile,
       conversationId,
       currentProfileName,
