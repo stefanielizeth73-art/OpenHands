@@ -1,0 +1,12 @@
+### Result
+{"initial":"Fast","status":201,"routing":[{"url":"http://127.0.0.1:18833/api/conversations","hasRouterInstruction":false}],"url":"http://127.0.0.1:18833/conversations/7221294f-ee1f-4274-b634-e7b33d86b063"}
+### Ran Playwright code
+```js
+await (async page => { await page.goto("http://127.0.0.1:18833/"); await page.getByTestId("chat-input-llm-profile").waitFor(); const initial=await page.getByTestId("chat-input-llm-profile").innerText(); if(initial!=="Fast") throw new Error("Expected Fast, found "+initial); page.__routing=[]; await page.getByTestId("chat-input-llm-profile").click(); await page.getByTestId("chat-input-llm-profile-option-Smart").click(); await page.getByTestId("conversation-panel-new-thread-picker").click(); const response=page.waitForResponse(r=>r.request().method()==="POST"&&new URL(r.url()).pathname==="/api/conversations"); await page.getByTestId("launch-no-workspace").click(); const r=await response; await page.waitForURL("**/conversations/**"); await page.screenshot({path:"C:/Users/ASUS/Desktop/GitHub_project/oss-contributions/research/openhands-canvas-20261101/19138-main-reproduced.png"}); return {initial,status:r.status(),routing:page.__routing,url:page.url()}; })(page);
+```
+### Page
+- Page URL: http://127.0.0.1:18833/conversations/7221294f-ee1f-4274-b634-e7b33d86b063
+- Page Title: ✅ Conversation 72212 | OpenHands
+- Console: 5 errors, 8 warnings
+### Events
+- New console entries: .playwright-cli\console-2026-11-01T08-30-00-050Z.log#L35-L50

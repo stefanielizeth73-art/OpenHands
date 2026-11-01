@@ -1,0 +1,8 @@
+{
+  "baseline_failed_tests": 52,
+  "baseline_passed_tests": 139,
+  "exploratory_failed_tests": 52,
+  "matching_failure_names": 52,
+  "only_changed_run": [],
+  "only_baseline_run": []
+}

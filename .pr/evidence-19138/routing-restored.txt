@@ -1,0 +1,12 @@
+### Result
+{"status":201,"routing":[{"url":"http://127.0.0.1:18832/api/conversations","keys":["agent_profile_id","agent_launch_additions","workspace","client_tools","confirmation_policy","max_iterations","stuck_detection","autotitle","title_llm_profile","worktree","tags","conversation_id","security_analyzer"],"hasRouterInstruction":true,"hasInitialMessage":false},{"url":"http://127.0.0.1:18832/api/conversations","keys":["agent_profile_id","workspace","client_tools","confirmation_policy","max_iterations","stuck_detection","autotitle","title_llm_profile","worktree","tags","conversation_id","security_analyzer","initial_message"],"hasRouterInstruction":false,"hasInitialMessage":true},{"url":"http://127.0.0.1:18832/api/conversations","keys":["agent_profile_id","agent_launch_additions","workspace","client_tools","confirmation_policy","max_iterations","stuck_detection","autotitle","title_llm_profile","worktree","tags","conversation_id","security_analyzer","initial_message"],"hasRouterInstruction":true,"hasInitialMessage":true}]}
+### Ran Playwright code
+```js
+await (async page => { await page.getByTestId("sidebar-conversations-link").click(); await page.getByTestId("home-chat-launcher").waitFor(); const response=page.waitForResponse(r=>r.request().method()==="POST"&&new URL(r.url()).pathname==="/api/conversations"); await page.getByTestId("chat-input").fill("Verify routing is restored after consuming the pick"); await page.getByTestId("chat-input").press("Enter"); const r=await response; return {status:r.status(),routing:page.__routing}; })(page);
+```
+### Page
+- Page URL: http://127.0.0.1:18832/conversations/2643cb61-cc29-421f-95b6-40c50211ec9b
+- Page Title: 🟢 Conversation 2643c | OpenHands
+- Console: 15 errors, 18 warnings
+### Events
+- New console entries: .playwright-cli\console-2026-11-01T08-23-33-517Z.log#L721-L1349

@@ -1,0 +1,12 @@
+### Result
+{"status":201,"routing":[{"url":"http://127.0.0.1:18832/api/conversations","keys":["agent_profile_id","agent_launch_additions","workspace","client_tools","confirmation_policy","max_iterations","stuck_detection","autotitle","title_llm_profile","worktree","tags","conversation_id","security_analyzer"],"hasRouterInstruction":true,"hasInitialMessage":false},{"url":"http://127.0.0.1:18832/api/conversations","keys":["agent_profile_id","workspace","client_tools","confirmation_policy","max_iterations","stuck_detection","autotitle","title_llm_profile","worktree","tags","conversation_id","security_analyzer","initial_message"],"hasRouterInstruction":false,"hasInitialMessage":true}]}
+### Ran Playwright code
+```js
+await (async page => { await page.getByTestId("sidebar-conversations-link").click(); await page.getByTestId("home-chat-launcher").waitFor(); const response=page.waitForResponse(r=>r.request().method()==="POST" && new URL(r.url()).pathname==="/api/conversations"); await page.getByTestId("chat-input").fill("Verify home routing suppression"); await page.getByTestId("chat-input").press("Enter"); const r=await response; return {status:r.status(),routing:page.__routing}; })(page);
+```
+### Page
+- Page URL: http://127.0.0.1:18832/conversations/d7f88d6c-0eaa-414a-bc0f-268f2ee6d63e
+- Page Title: 🟢 Conversation d7f88 | OpenHands
+- Console: 8 errors, 16 warnings
+### Events
+- New console entries: .playwright-cli\console-2026-11-01T08-23-33-517Z.log#L711-L720
