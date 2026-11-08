@@ -1,4 +1,10 @@
-import { useEffect, useMemo, useState } from "react";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type KeyboardEvent,
+} from "react";
 import { useTranslation } from "react-i18next";
 import { I18nKey } from "#/i18n/declaration";
 import XMarkIcon from "#/icons/x-mark.svg?react";
@@ -207,6 +213,33 @@ export function RunLogsModal({
 }: RunLogsModalProps) {
   const { t } = useTranslation("openhands");
   const [activeTab, setActiveTab] = useState<LogTab>("stdout");
+  const stdoutTabRef = useRef<HTMLButtonElement>(null);
+  const stderrTabRef = useRef<HTMLButtonElement>(null);
+
+  const handleTabKeyDown = (
+    event: KeyboardEvent<HTMLButtonElement>,
+    tab: LogTab,
+  ) => {
+    if (event.altKey || event.ctrlKey || event.metaKey) return;
+    let next: LogTab;
+    switch (event.key) {
+      case "ArrowLeft":
+      case "ArrowRight":
+        next = tab === "stdout" ? "stderr" : "stdout";
+        break;
+      case "Home":
+        next = "stdout";
+        break;
+      case "End":
+        next = "stderr";
+        break;
+      default:
+        return;
+    }
+    event.preventDefault();
+    setActiveTab(next);
+    (next === "stdout" ? stdoutTabRef : stderrTabRef).current?.focus();
+  };
 
   const {
     data: outputs,
@@ -300,11 +333,13 @@ export function RunLogsModal({
             <button
               type="button"
               role="tab"
+              ref={stdoutTabRef}
               aria-selected={activeTab === "stdout"}
               aria-controls="run-logs-panel-stdout"
               id="run-logs-tab-stdout"
               tabIndex={activeTab === "stdout" ? 0 : -1}
               onClick={() => setActiveTab("stdout")}
+              onKeyDown={(event) => handleTabKeyDown(event, "stdout")}
               className={`${tabBaseClass} ${
                 activeTab === "stdout" ? tabActiveClass : tabInactiveClass
               }`}
@@ -314,11 +349,13 @@ export function RunLogsModal({
             <button
               type="button"
               role="tab"
+              ref={stderrTabRef}
               aria-selected={activeTab === "stderr"}
               aria-controls="run-logs-panel-stderr"
               id="run-logs-tab-stderr"
               tabIndex={activeTab === "stderr" ? 0 : -1}
               onClick={() => setActiveTab("stderr")}
+              onKeyDown={(event) => handleTabKeyDown(event, "stderr")}
               className={`${tabBaseClass} ${
                 activeTab === "stderr" ? tabActiveClass : tabInactiveClass
               }`}

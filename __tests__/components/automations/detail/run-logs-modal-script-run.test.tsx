@@ -7,6 +7,7 @@
  */
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { render, screen, waitFor } from "@testing-library/react";
+import userEvent from "@testing-library/user-event";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { I18nKey } from "#/i18n/declaration";
 import { RunLogsModal } from "#/components/features/automations/detail/run-logs-modal";
@@ -82,6 +83,56 @@ afterEach(() => {
 });
 
 describe("RunLogsModal — script run without a conversation (cloud)", () => {
+  it("lets keyboard users switch streams, wrap and select the first/last tab", async () => {
+    batchGetCloudSandboxesMock.mockResolvedValue([runningSandbox]);
+    listOutputsMock.mockResolvedValue([
+      {
+        kind: "BashOutput",
+        id: "out-keyboard",
+        command_id: "cmd-1",
+        timestamp: "2026-01-01T10:00:00Z",
+        order: 0,
+        stdout: "normal output",
+        stderr: "error output",
+      },
+    ]);
+    const user = userEvent.setup();
+    renderModal();
+    await screen.findByText("normal output");
+    const output = screen.getByRole("tab", {
+      name: I18nKey.AUTOMATIONS$DETAIL$LOGS_TAB_OUTPUT,
+    });
+    const error = screen.getByRole("tab", {
+      name: I18nKey.AUTOMATIONS$DETAIL$LOGS_TAB_ERROR,
+    });
+    await user.click(output);
+    await user.keyboard("{ArrowRight}");
+    expect(error).toHaveFocus();
+    expect(error).toHaveAttribute("aria-selected", "true");
+    expect(error).toHaveAttribute("tabindex", "0");
+    expect(output).toHaveAttribute("tabindex", "-1");
+    expect(
+      screen.getByRole("tabpanel", {
+        name: I18nKey.AUTOMATIONS$DETAIL$LOGS_TAB_ERROR,
+      }),
+    ).toHaveTextContent("error output");
+    await user.keyboard("{ArrowRight}");
+    expect(output).toHaveFocus();
+    await user.keyboard("{ArrowLeft}");
+    expect(error).toHaveFocus();
+    await user.keyboard("{Home}");
+    expect(output).toHaveFocus();
+    expect(
+      screen.getByRole("tabpanel", {
+        name: I18nKey.AUTOMATIONS$DETAIL$LOGS_TAB_OUTPUT,
+      }),
+    ).toHaveTextContent("normal output");
+    await user.keyboard("{End}");
+    expect(error).toHaveFocus();
+    expect(error).toHaveAttribute("aria-selected", "true");
+    expect(listOutputsMock).toHaveBeenCalledTimes(1);
+  });
+
   it("shows the run's output instead of loading forever", async () => {
     // Arrange
     batchGetCloudSandboxesMock.mockResolvedValue([runningSandbox]);
