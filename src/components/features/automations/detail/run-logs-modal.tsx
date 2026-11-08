@@ -3,7 +3,7 @@ import {
   useMemo,
   useRef,
   useState,
-  type KeyboardEvent,
+  type KeyboardEvent as ReactKeyboardEvent,
 } from "react";
 import { useTranslation } from "react-i18next";
 import { I18nKey } from "#/i18n/declaration";
@@ -217,7 +217,7 @@ export function RunLogsModal({
   const stderrTabRef = useRef<HTMLButtonElement>(null);
 
   const handleTabKeyDown = (
-    event: KeyboardEvent<HTMLButtonElement>,
+    event: ReactKeyboardEvent<HTMLButtonElement>,
     tab: LogTab,
   ) => {
     if (event.altKey || event.ctrlKey || event.metaKey) return;
