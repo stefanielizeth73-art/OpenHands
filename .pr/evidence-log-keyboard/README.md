@@ -1,58 +1,15 @@
-# Automation log tabs: keyboard baseline
+# Automation log tabs keyboard evidence
 
-Canvas 1.37.0 at `cc99322a1efd0f4be8d6934ae93a4d1d4bc33e05`, Windows Chrome,
-Node 24.22.1 for the frontend build, real Agent Server 1.60.1 and automation
-1.30.1 in the existing Ubuntu WSL environment. The stack was launched with this
-checkout's production `control-openhands launch --new --no-browser --build auto`.
-No model was called. The script fixture only prints to stdout and stderr.
+Issue: OpenHands/OpenHands#19522. Baseline product source: cc99322a1efd0f4be8d6934ae93a4d1d4bc33e05. Fixed code includes e8313790 and the React/native keyboard type clarification fa42f0b. Canvas1.37.0, SDK/AgentServer1.60.1, automation1.30.1, Windows Chrome, Node24.22.1/npm11.12.1 frontend builds, existing Ubuntu WSL Node24.21.0 launcher. No model inference was used.
 
-## Reproduce
+Both checkouts were launched through their unmodified `.agents/skills/verify-openhands/scripts/control-openhands launch --new --no-browser --build auto --port-from <port> --timeout 240`, then `doctor --skip-ui`. Baseline ingress3260, fixed3280. Doctor passes; its unconfigured-LLM warning is expected for this script-only automation.
 
-1. Make a gzip tar bundle containing `logs_fixture.py`:
+Create a Python script bundle with `print('stdout-visible')` and `print('stderr-keyboard-proof', file=sys.stderr)`, upload through the automation upload API, create an inactive cron automation with entrypoint `python logs_fixture.py`, and explicitly dispatch once. This exercises the actual automation service, sandbox log API, Canvas query and modal. The UI still reports RUNNING in both runs; these artifacts assert log delivery and tab selection, not successful run completion.
 
-   ```python
-   import sys
-   print('stdout-visible')
-   print('stderr-keyboard-proof', file=sys.stderr)
-   ```
+1. Open its run Logs, focus Output and press ArrowRight.
+2. Baseline: two attempts leave Output selected/focused and display stdout. Clicking Error with the mouse displays real stderr (control).
+3. Fixed: two attempts select and focus Error and show stderr. ArrowRight wraps back to Output; ArrowLeft wraps to Error; Home selects stdout; End selects stderr.
 
-2. On a local Canvas, upload it with `POST /api/automation/v1/uploads?name=keyboard-logs`
-   (`Content-Type: application/gzip`, the run's `X-Session-API-Key`). Create an
-   inactive script automation with `POST /api/automation/v1`:
+Artifacts: `baseline.webm`, `before-arrow.png`, `before-mouse.png`, `fixed.webm`, `after-arrow.png`. The native browser videos use the same script contents and operation sequence; no responses are mocked.
 
-   ```json
-   {
-     "name": "Keyboard log tabs validation",
-     "entrypoint": "python logs_fixture.py",
-     "tarball_path": "<upload response tarball_path>",
-     "trigger": {"type":"cron","schedule":"0 0 1 1 *","timezone":"UTC"},
-     "state": "INACTIVE"
-   }
-   ```
-
-3. Dispatch it with `POST /api/automation/v1/<id>/dispatch`. Open the automation
-   detail page and its run's **View logs** button. Wait for `stdout-visible`.
-4. Focus the **Output** tab and press **ArrowRight**. The **Error** tab remains
-   unselected and focus stays on `run-logs-tab-stdout`. **Tab** cannot reach Error
-   because it has `tabIndex=-1`.
-5. Click **Error** with the mouse: `stderr-keyboard-proof` is present. This
-   control shows the output exists and isolates the failure to keyboard navigation.
-
-## Observations
-
-Both independent attempts in `baseline.webm` produced:
-
-```json
-{
-  "afterArrow": {
-    "selected": "false",
-    "panel": "stdout-visible\n",
-    "focused": "run-logs-tab-stdout"
-  },
-  "mouseControl": "stderr-keyboard-proof\n"
-}
-```
-
-`before-arrow.png` shows the unchanged Output panel after ArrowRight;
-`before-mouse.png` shows the same run's stderr after the mouse control.
-These are unmodified captures of the running Canvas and real backend logs.
+Tests: regression fails on original product (1 failed/2 passed); both modal suites pass after the fix (23 tests). Final lint/typecheck and production app/library builds pass. Full Windows suite:10177 passed,66 failed,45 pending,7 todo. Of those,60 failing test names exactly match unchanged-main controls;6 additional timeouts all pass when their six files run with one worker (40 passed). See comparison JSON. No test timeout/config/fixture changes were made.
