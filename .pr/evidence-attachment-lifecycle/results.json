@@ -1,0 +1,70 @@
+[
+  {
+    "label": "before",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      }
+    ]
+  },
+  {
+    "label": "after",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": false
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": false
+      }
+    ]
+  },
+  {
+    "label": "before-phone",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      }
+    ]
+  },
+  {
+    "label": "after-phone",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": false
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": false
+      }
+    ]
+  }
+]

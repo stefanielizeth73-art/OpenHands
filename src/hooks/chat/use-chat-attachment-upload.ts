@@ -1,4 +1,4 @@
-import { useCallback } from "react";
+import { useCallback, useEffect, useRef } from "react";
 
 export type ChatAttachmentUploadOptions = {
   fromPaste?: boolean;
@@ -13,6 +13,14 @@ import { useConversationStore } from "#/stores/conversation-store";
  * Shared attachment pipeline for home and conversation chat inputs.
  */
 export function useChatAttachmentUpload() {
+  const pendingUploads = useRef(new Set<AbortController>());
+  useEffect(() => {
+    const pending = pendingUploads.current;
+    return () => {
+      pending.forEach((upload) => upload.abort());
+      pending.clear();
+    };
+  }, []);
   const {
     images,
     files,
@@ -43,12 +51,17 @@ export function useChatAttachmentUpload() {
 
       validFiles.forEach((file) => addFileLoading(file.name));
       validImages.forEach((image) => addImageLoading(image.name));
+      const upload = new AbortController();
+      pendingUploads.current.add(upload);
 
       try {
         const [fileResults, imageResults] = await Promise.all([
           processFiles(validFiles),
           processImages(validImages),
         ]);
+        // The old input clears its attachments on unmount. Its readers may
+        // finish later, while a different composer owns the shared store.
+        if (upload.signal.aborted) return;
 
         if (fileResults.successful.length > 0) {
           addFiles(fileResults.successful);
@@ -78,11 +91,14 @@ export function useChatAttachmentUpload() {
           );
         });
       } catch {
+        if (upload.signal.aborted) return;
         validFiles.forEach((file) => removeFileLoading(file.name));
         validImages.forEach((image) => removeImageLoading(image.name));
         displayErrorToast(
           "An unexpected error occurred while processing files",
         );
+      } finally {
+        pendingUploads.current.delete(upload);
       }
     },
     [
