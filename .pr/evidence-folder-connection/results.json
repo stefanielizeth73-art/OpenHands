@@ -1,0 +1,126 @@
+[
+  {
+    "label": "before",
+    "results": [
+      {
+        "attempt": 1,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": false
+      },
+      {
+        "attempt": 2,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": false
+      }
+    ]
+  },
+  {
+    "label": "after",
+    "results": [
+      {
+        "attempt": 1,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+          "listing": "second-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": true
+      },
+      {
+        "attempt": 2,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+          "listing": "second-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": true
+      }
+    ]
+  },
+  {
+    "label": "before-phone",
+    "results": [
+      {
+        "attempt": 1,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": false
+      },
+      {
+        "attempt": 2,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": false
+      }
+    ]
+  },
+  {
+    "label": "after-phone",
+    "results": [
+      {
+        "attempt": 1,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+          "listing": "second-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": true
+      },
+      {
+        "attempt": 2,
+        "first": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/private/home",
+          "listing": "first-home-marker\nFolder"
+        },
+        "after": {
+          "path": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+          "listing": "second-home-marker\nFolder"
+        },
+        "expectedHome": "/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1201-10c630/private/home",
+        "usesEditedConnection": true
+      }
+    ]
+  }
+]

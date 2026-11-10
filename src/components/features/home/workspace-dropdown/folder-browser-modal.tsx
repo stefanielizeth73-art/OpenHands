@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslation } from "react-i18next";
 
 import { BaseModalTitle } from "#/components/shared/modals/confirmation-modals/base-modal";
@@ -129,8 +129,28 @@ export function FolderBrowserModal({
   onAddParent,
 }: FolderBrowserModalProps) {
   const { t } = useTranslation("openhands");
-  const [currentPath, setCurrentPath] = useState<string | null>(null);
   const active = useActiveBackend();
+  const backendScope = JSON.stringify([
+    active.backend.id,
+    active.backend.connectionRevision ?? 0,
+    active.orgId,
+  ]);
+  const [location, setLocation] = useState<{
+    scope: string;
+    path: string | null;
+  }>({ scope: backendScope, path: null });
+  // A connection edit must hide its old path before any query can use it
+  // against the new server, including while this modal stays open.
+  const currentPath = location.scope === backendScope ? location.path : null;
+  const setCurrentPath = useCallback(
+    (path: string | null) =>
+      setLocation((previous) =>
+        previous.scope === backendScope && previous.path === path
+          ? previous
+          : { scope: backendScope, path },
+      ),
+    [backendScope],
+  );
 
   const { data: homeData } = useHomeDirectory();
 
@@ -144,13 +164,7 @@ export function FolderBrowserModal({
     if (!isOpen) {
       setCurrentPath(null);
     }
-  }, [isOpen, homeData?.home, currentPath]);
-
-  // A backend switch invalidates the previous path — clear it so the
-  // open/close effect can re-seed from the new backend's homeData.home.
-  useEffect(() => {
-    setCurrentPath(null);
-  }, [active.backend.id, active.orgId]);
+  }, [isOpen, homeData?.home, currentPath, setCurrentPath]);
 
   const {
     data: listing,
