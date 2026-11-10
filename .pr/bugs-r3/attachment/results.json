@@ -1,0 +1,36 @@
+[
+  {
+    "label": "before",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      }
+    ]
+  },
+  {
+    "label": "before-phone",
+    "results": [
+      {
+        "attempt": 1,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      },
+      {
+        "attempt": 2,
+        "selectedFiles": 1000,
+        "totalBytes": 2048000,
+        "staleAttachmentVisible": true
+      }
+    ]
+  }
+]
