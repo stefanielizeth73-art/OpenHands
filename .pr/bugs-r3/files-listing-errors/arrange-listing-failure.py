@@ -1,5 +1,6 @@
 """Temporarily move only an isolated verification run's own workspace."""
 import sys
+import time
 from pathlib import Path
 
 root = Path('D:/GitHub_project/oss-contributions/validation/openhands-r3-runs' if sys.platform=='win32' else '/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs').resolve()
@@ -19,6 +20,16 @@ elif mode == 'restore':
     assert unavailable.is_dir() and (unavailable / 'listing-validation.txt').is_file()
     assert not workspace.exists()
     unavailable.rename(workspace)
+elif mode in {'verify_failed', 'verify_restored'}:
+    deadline=time.monotonic()+10
+    while time.monotonic()<deadline:
+        if mode=='verify_failed' and not workspace.exists():
+            break
+        if mode=='verify_restored' and (workspace/'listing-validation.txt').is_file():
+            break
+        time.sleep(0.1)
+    else:
+        raise RuntimeError(f'Server filesystem did not observe {mode}')
 else:
     raise SystemExit('Unsupported mode')
 print(f'{mode}: isolated workspace {run.name}')

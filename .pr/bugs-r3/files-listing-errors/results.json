@@ -4,9 +4,9 @@
       "label": "before",
       "attempt": 1,
       "command": {
-        "id": "bf706a367c6b44c59f5e79962f8aa1fe",
-        "timestamp": "2026-11-10T15:09:39.183988Z",
-        "command_id": "e0f042b71744470d9207bb440027af5e",
+        "id": "beff050b43d04708bfb04c3a217408ea",
+        "timestamp": "2026-11-10T15:20:22.503387Z",
+        "command_id": "a117dc97fc1e4d6db0f86b496c841399",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -14,9 +14,9 @@
         "kind": "BashOutput"
       },
       "freshCommand": {
-        "id": "57e09b5e33514c2d93b7c689e69ae28b",
-        "timestamp": "2026-11-10T15:09:40.233076Z",
-        "command_id": "84a490b109c649c7904890844562fe24",
+        "id": "4729bd1c6c6344af8ecb665349d1f6e0",
+        "timestamp": "2026-11-10T15:20:23.703133Z",
+        "command_id": "2ed5ce94bc224dc3874e1259d0c8d288",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -44,9 +44,9 @@
       "label": "before",
       "attempt": 2,
       "command": {
-        "id": "4e3454fc104f4315afe73e4f9bf30199",
-        "timestamp": "2026-11-10T15:09:45.260771Z",
-        "command_id": "b8a0faa517cb4dac8dd462f40fbbfa5a",
+        "id": "eed7ee0609ac412f9885a6e65db22c73",
+        "timestamp": "2026-11-10T15:20:29.565128Z",
+        "command_id": "7b05fee1a3bb4af38cc71bc1ffee1ba3",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -54,9 +54,9 @@
         "kind": "BashOutput"
       },
       "freshCommand": {
-        "id": "89e60b88afe447f9b3e33c9a29e6f7e3",
-        "timestamp": "2026-11-10T15:09:46.192138Z",
-        "command_id": "8452ee4e2d3d4bbda74b32fd25e5b32b",
+        "id": "e599a72d73e74a798ad4948bd9162b9a",
+        "timestamp": "2026-11-10T15:20:30.683152Z",
+        "command_id": "bc0a463334af4e3db678ea42bce638a9",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -84,9 +84,9 @@
       "label": "before-phone",
       "attempt": 1,
       "command": {
-        "id": "11135c8e3a7f4c6b836a6f098a4e3037",
-        "timestamp": "2026-11-10T15:10:39.626794Z",
-        "command_id": "18605a5434e5452dadd499929ce66359",
+        "id": "5f2fea4b7c724b2db4c18e5b42696766",
+        "timestamp": "2026-11-10T15:20:42.270351Z",
+        "command_id": "4c6dcfc14d4f4789a656525feddfda2e",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -94,9 +94,9 @@
         "kind": "BashOutput"
       },
       "freshCommand": {
-        "id": "e215d5dcdf1b468aab5c667857bd224a",
-        "timestamp": "2026-11-10T15:10:40.608474Z",
-        "command_id": "444dd05f7d9d48ab9cd01615ee58fdae",
+        "id": "4d308f18f67d420ab31cff47d3cb62e7",
+        "timestamp": "2026-11-10T15:20:43.302344Z",
+        "command_id": "61bffb83080942a6beb5fc48be50fbbe",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -124,9 +124,9 @@
       "label": "before-phone",
       "attempt": 2,
       "command": {
-        "id": "ca1fcf1cbafe464592fe0968327ba7f3",
-        "timestamp": "2026-11-10T15:10:44.976534Z",
-        "command_id": "15fd731aef6f4b458437525187a2008a",
+        "id": "bc7b1a48029144ac9032e77013a2b616",
+        "timestamp": "2026-11-10T15:20:48.313891Z",
+        "command_id": "2093881981b148898c86c7cb562566e2",
         "order": 0,
         "exit_code": -1,
         "stdout": null,
@@ -134,9 +134,9 @@
         "kind": "BashOutput"
       },
       "freshCommand": {
-        "id": "769f6bcfccba490895e876a12dcc7e23",
-        "timestamp": "2026-11-10T15:10:45.924062Z",
-        "command_id": "e632b4b0a7ea44b9bf15ba49fe00faa2",
+        "id": "ec63dd0da44b4682b3c2ef4b2c645425",
+        "timestamp": "2026-11-10T15:20:49.282269Z",
+        "command_id": "66ba0352d8ca4777b2e8526e8d3a02fc",
         "order": 0,
         "exit_code": -1,
         "stdout": null,

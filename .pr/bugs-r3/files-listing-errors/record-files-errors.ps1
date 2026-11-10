@@ -17,18 +17,26 @@ function Run-Step([string]$Step,[int]$Attempt=0) {
 }
 function Arrange-Workspace([string]$Mode) {
   python -X utf8 "$audit/arrange-listing-failure.py" $RunName $Mode
+  if($LASTEXITCODE -ne 0) { throw "Workspace arrangement failed: $Mode" }
+  if($Mode -eq 'fail' -or $Mode -eq 'restore') {
+    $check=if($Mode -eq 'fail') {'verify_failed'} else {'verify_restored'}
+    wsl -d Ubuntu -- /home/asus/.local/share/uv/python/cpython-3.13.18-linux-x86_64-gnu/bin/python3.13 /mnt/c/Users/ASUS/Desktop/GitHub_project/oss-contributions/research/openhands-r3-20261110/arrange-listing-failure.py $RunName $check 2> "$audit/files-$Label-filesystem-$check.log"
+    if($LASTEXITCODE -ne 0) { throw "Server filesystem verification failed: $check" }
+  }
 }
 Arrange-Workspace 'prepare'
 if($LASTEXITCODE -ne 0) { throw 'Workspace preparation failed' }
 try {
   Run-Step 'start'
   foreach($attempt in 1,2) {
-    Arrange-Workspace 'fail'
-    if($LASTEXITCODE -ne 0) { throw 'Workspace failure arrangement failed' }
-    try { Run-Step 'failure' $attempt }
+    try {
+      Arrange-Workspace 'fail'
+      Run-Step 'failure' $attempt
+    }
     finally {
-      Arrange-Workspace 'restore'
-      if($LASTEXITCODE -ne 0) { throw 'Workspace restoration failed' }
+      if(Test-Path -LiteralPath "D:/GitHub_project/oss-contributions/validation/openhands-r3-runs/$RunName/workspace-unavailable-for-listing-proof") {
+        Arrange-Workspace 'restore'
+      }
     }
     Run-Step 'recovery' $attempt
   }
