@@ -27,6 +27,7 @@ export interface WorkspaceFilesResult {
   data: string[] | undefined;
   isLoading: boolean;
   isTruncated?: boolean;
+  error?: Error | null;
 }
 
 function normalizePath(path: string): string {
@@ -107,6 +108,7 @@ function useLocalWorkspaceFiles(enabled: boolean): WorkspaceFilesResult {
     data: query.data?.paths,
     isLoading: discovery.isLoading || query.isLoading,
     isTruncated: query.data?.isTruncated ?? false,
+    error: query.error,
   };
 }
 
@@ -161,7 +163,11 @@ function useCloudWorkspaceFiles(enabled: boolean): WorkspaceFilesResult {
     meta: { disableToast: true },
   });
 
-  return { data: query.data, isLoading: query.isLoading };
+  return {
+    data: query.data,
+    isLoading: query.isLoading,
+    error: query.error,
+  };
 }
 
 /**

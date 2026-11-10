@@ -241,6 +241,18 @@ function FilesTab() {
             onToggleTree={toggleTreeVisible}
             actions={quickRowActions}
           />
+          {filesQuery.error && (
+            <div
+              role="alert"
+              className="shrink-0 border-b border-border px-3 py-2 text-xs text-status-fail-text"
+            >
+              <p>{t(I18nKey.FILES$LIST_ERROR)}</p>
+              <p className="max-h-24 overflow-y-auto whitespace-pre-wrap break-words">
+                {filesQuery.error.message}
+              </p>
+              {paths.length > 0 && <p>{t(I18nKey.FILES$LIST_STALE)}</p>}
+            </div>
+          )}
           <div ref={treeLayoutRef} className="flex h-full min-h-0 flex-1">
             {isTreeVisible && (
               <>
@@ -253,11 +265,13 @@ function FilesTab() {
                     } as CSSProperties
                   }
                 >
-                  <FileTreeView
-                    paths={paths}
-                    selectedPath={selectedPath}
-                    onSelectFile={handleSelectFile}
-                  />
+                  {(!filesQuery.error || paths.length > 0) && (
+                    <FileTreeView
+                      paths={paths}
+                      selectedPath={selectedPath}
+                      onSelectFile={handleSelectFile}
+                    />
+                  )}
                 </aside>
                 <ResizeHandle
                   testId={FILES_TAB_TREE_RESIZE_HANDLE_TEST_ID}
