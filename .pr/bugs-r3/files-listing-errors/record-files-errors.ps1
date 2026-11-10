@@ -15,16 +15,19 @@ function Run-Step([string]$Step,[int]$Attempt=0) {
   & $node $cli -s=openhands-r3-base run-code $code *> "$audit/files-$Label-$Step-$Attempt.log"
   if($LASTEXITCODE -ne 0) { throw "Browser step failed: $Step $Attempt" }
 }
-python -X utf8 "$audit/arrange-listing-failure.py" $RunName prepare
+function Arrange-Workspace([string]$Mode) {
+  python -X utf8 "$audit/arrange-listing-failure.py" $RunName $Mode
+}
+Arrange-Workspace 'prepare'
 if($LASTEXITCODE -ne 0) { throw 'Workspace preparation failed' }
 try {
   Run-Step 'start'
   foreach($attempt in 1,2) {
-    python -X utf8 "$audit/arrange-listing-failure.py" $RunName fail
+    Arrange-Workspace 'fail'
     if($LASTEXITCODE -ne 0) { throw 'Workspace failure arrangement failed' }
     try { Run-Step 'failure' $attempt }
     finally {
-      python -X utf8 "$audit/arrange-listing-failure.py" $RunName restore
+      Arrange-Workspace 'restore'
       if($LASTEXITCODE -ne 0) { throw 'Workspace restoration failed' }
     }
     Run-Step 'recovery' $attempt

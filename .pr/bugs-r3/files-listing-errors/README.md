@@ -9,3 +9,5 @@ This reproduces twice at 1280×800 and twice at 390×844. On phones, Show panel 
 [Desktop recording](files-before.webm) · [Phone recording](files-before-phone.webm) · [Actual command results and UI assertions](results.json).
 
 Implementation investigation and local verification used Codex assistance.
+
+The final driver matches the exact `find . -type…` listing request, excluding background Git probes on the same endpoint, and records the failing command after both Refresh and page reload.
