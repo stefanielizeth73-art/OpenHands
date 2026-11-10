@@ -1,0 +1,31 @@
+async page => {
+  const origin='http://localhost:__PORT__';
+  const p=page.context().browser().contexts().flatMap(c=>c.pages()).find(p=>p.video() && p.url().startsWith(origin));
+  if(!p) throw new Error('Recording page missing');
+  const output='C:/Users/ASUS/Desktop/GitHub_project/oss-contributions/research/openhands-r3-20261110/output/playwright';
+  const isListing=r=>r.request().method()==='POST' && r.url().includes('execute') && r.request().postDataJSON()?.command?.startsWith('find . -type');
+  const fixed='__LABEL__'.startsWith('after');
+  const response=p.waitForResponse(isListing,{timeout:20000});
+  await p.getByTestId('files-tab-refresh').click();
+  const r=await response;
+  const command=await r.json();
+  await p.getByTestId('files-tab-refresh').waitFor({state:'visible'});
+  if(fixed) await p.getByTestId('files-tab').getByRole('alert').waitFor({timeout:10000}).catch(()=>{throw new Error(JSON.stringify({command,request:r.request().postDataJSON(),text:p.url()}));});
+  await p.waitForTimeout(400);
+  const retained={listingVisible:await p.getByText('listing-validation.txt',{exact:true}).count()>0,alert:await p.getByTestId('files-tab').getByRole('alert').count()>0,text:await p.getByTestId('files-tab').innerText()};
+  await p.screenshot({path:`${output}/files-__LABEL__-retained-__ATTEMPT__.png`});
+  const freshResponse=p.waitForResponse(isListing,{timeout:30000});
+  await p.reload();
+  await p.getByTestId('files-tab').or(p.getByRole('button',{name:'Show panel',exact:true})).first().waitFor({timeout:15000});
+  if(await p.getByRole('button',{name:'Show panel',exact:true}).isVisible()) await p.getByRole('button',{name:'Show panel',exact:true}).click();
+  await p.getByTestId('files-tab-refresh').waitFor({timeout:15000});
+  const freshCommand=await (await freshResponse).json();
+  if(fixed) await p.getByTestId('files-tab').getByRole('alert').waitFor({timeout:10000});
+  else await p.getByText('No files in workspace',{exact:true}).waitFor({timeout:10000});
+  await p.waitForTimeout(400);
+  const fresh={noFiles:await p.getByText('No files in workspace',{exact:true}).count()>0,alert:await p.getByTestId('files-tab').getByRole('alert').count()>0,text:await p.getByTestId('files-tab').innerText()};
+  if(command.exit_code===0 || freshCommand.exit_code===0 || !retained.listingVisible || retained.alert!==fixed || fresh.alert!==fixed || fresh.noFiles===fixed) throw new Error(JSON.stringify({label:'__LABEL__',command,freshCommand,retained,fresh}));
+  await p.screenshot({path:`${output}/files-__LABEL__-initial-__ATTEMPT__.png`});
+  await p.waitForTimeout(600);
+  return {label:'__LABEL__',attempt:__ATTEMPT__,command,freshCommand,retained,fresh};
+}
