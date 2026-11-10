@@ -1,0 +1,122 @@
+[
+  {
+    "failure": {
+      "label": "before",
+      "attempt": 1,
+      "command": {
+        "id": "966b965036564334ae8eb3f1bb8a1167",
+        "timestamp": "2026-11-10T14:54:49.058927Z",
+        "command_id": "5b3836ab137a4ea59a1cfa60f7f9df6a",
+        "order": 0,
+        "exit_code": -1,
+        "stdout": null,
+        "stderr": "Error executing command: [Errno 2] No such file or directory: '/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace'",
+        "kind": "BashOutput"
+      },
+      "retained": {
+        "listingVisible": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nlisting-validation.txt\n\nSelect a file to view its contents"
+      },
+      "fresh": {
+        "noFiles": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nNo files in workspace\n\nSelect a file to view its contents"
+      }
+    },
+    "recovery": {
+      "recovered": true,
+      "alert": false
+    }
+  },
+  {
+    "failure": {
+      "label": "before",
+      "attempt": 2,
+      "command": {
+        "id": "4212b658e7ae4160882685223d89583e",
+        "timestamp": "2026-11-10T14:54:56.015958Z",
+        "command_id": "2b3a67873e134a24ba8fca42b1bfafc4",
+        "order": 0,
+        "exit_code": -1,
+        "stdout": null,
+        "stderr": "Error executing command: [Errno 2] No such file or directory: '/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace'",
+        "kind": "BashOutput"
+      },
+      "retained": {
+        "listingVisible": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nlisting-validation.txt\n\nSelect a file to view its contents"
+      },
+      "fresh": {
+        "noFiles": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nNo files in workspace\n\nSelect a file to view its contents"
+      }
+    },
+    "recovery": {
+      "recovered": true,
+      "alert": false
+    }
+  },
+  {
+    "failure": {
+      "label": "before-phone",
+      "attempt": 1,
+      "command": {
+        "id": "5417d9c6320a4d89a55470ba245e3b5c",
+        "timestamp": "2026-11-10T14:58:05.768669Z",
+        "command_id": "26bddb8a2ad44f88ad6edd6e4d22465e",
+        "order": 0,
+        "exit_code": -1,
+        "stdout": null,
+        "stderr": "Error executing command: [Errno 2] No such file or directory: '/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace'",
+        "kind": "BashOutput"
+      },
+      "retained": {
+        "listingVisible": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nlisting-validation.txt\n\nSelect a file to view its contents"
+      },
+      "fresh": {
+        "noFiles": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nNo files in workspace\n\nSelect a file to view its contents"
+      }
+    },
+    "recovery": {
+      "recovered": true,
+      "alert": false
+    }
+  },
+  {
+    "failure": {
+      "label": "before-phone",
+      "attempt": 2,
+      "command": {
+        "id": "0ddc2e3212504b0c9b9d2aafc5d360f1",
+        "timestamp": "2026-11-10T14:58:11.241836Z",
+        "command_id": "825359087e5e4f68b997d437e174b1bf",
+        "order": 0,
+        "exit_code": -1,
+        "stdout": null,
+        "stderr": "Error executing command: [Errno 2] No such file or directory: '/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace'",
+        "kind": "BashOutput"
+      },
+      "retained": {
+        "listingVisible": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nlisting-validation.txt\n\nSelect a file to view its contents"
+      },
+      "fresh": {
+        "noFiles": true,
+        "alert": false,
+        "text": "Workspace:\n/mnt/d/GitHub_project/oss-contributions/validation/openhands-r3-runs/2026-11-10T1153-ad625b/workspace\nFile discovery\nNo files in workspace\n\nSelect a file to view its contents"
+      }
+    },
+    "recovery": {
+      "recovered": true,
+      "alert": false
+    }
+  }
+]
